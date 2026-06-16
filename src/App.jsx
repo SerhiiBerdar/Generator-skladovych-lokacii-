@@ -248,6 +248,40 @@ export default function App() {
       `}</style>
 
       <div className="p-6 space-y-6 bg-gray-100 min-h-screen print-root">
+        <div className="flex min-h-screen bg-gray-100">
+  <div
+    style={{
+      width: "260px",
+      background: "#0f172a",
+      color: "white",
+      padding: "24px",
+    }}
+    className="print-hide"
+  >
+    <h2 style={{ fontSize: "24px", fontWeight: "bold" }}>
+      📦 Generátor Lokácií
+    </h2>
+
+    <div style={{ marginTop: "30px" }}>
+      <div style={{ padding: "12px" }}>⚙ Nastavenia</div>
+      <div style={{ padding: "12px" }}>📝 Dáta</div>
+      <div style={{ padding: "12px" }}>👁 Náhľad</div>
+      <div style={{ padding: "12px" }}>📄 PDF Export</div>
+
+      <button
+        onClick={() => setShowFAQ(!showFAQ)}
+        style={{
+          marginTop: "20px",
+          width: "100%",
+          padding: "12px",
+        }}
+      >
+        ❓ FAQ
+      </button>
+    </div>
+  </div>
+
+  <div className="flex-1 p-6">
         <Card className="shadow-xl rounded-2xl print-hide">
           <CardContent className="space-y-4 p-6">
             <div className="grid grid-cols-2 gap-4">
@@ -320,71 +354,6 @@ export default function App() {
     Generovať PDF
   </Button>
 </div>
-
-            <div
-              className={`fixed top-4 right-4 z-50 transition-all duration-300 ${
-                showFAQ ? "w-[520px]" : "w-80"
-              } shadow-2xl border border-blue-200 rounded-2xl overflow-hidden bg-blue-50 backdrop-blur`}
-            >
-              <button
-                type="button"
-                onClick={() => setShowFAQ(!showFAQ)}
-                className="w-full text-left px-5 py-4 font-semibold text-blue-900 hover:bg-blue-100 transition text-lg flex items-center justify-between"
-              >
-                <span>FAQ / Pomoc</span>
-                <span className="text-xl">{showFAQ ? "▲" : "▼"}</span>
-              </button>
-
-              {showFAQ && (
-                <div className="p-6 text-sm text-blue-900 leading-7 border-t border-blue-200 bg-white max-h-[75vh] overflow-y-auto">
-                  <div className="space-y-4">
-                    <div className="text-base font-bold">
-                      Kompletný návod k aplikácii
-                    </div>
-
-                    <div>
-                      Tento nástroj slúži na generovanie skladových lokácií,
-                      QR kódov a tlačových A4 kariet.
-                    </div>
-
-                    <div>
-                      <strong>Postup používania:</strong>
-                    </div>
-
-                    <div className="space-y-2 pl-2">
-                      <div>1. Do poľa <strong>Popisy</strong> vlož horné názvy lokalít.</div>
-                      <div>2. Do poľa <strong>Lokácie / QR</strong> vlož QR texty alebo skladové lokácie.</div>
-                      <div>3. Každý riadok predstavuje 1 samostatnú A4 kartu.</div>
-                      <div>4. Klikni na <strong>Generovať obrázky</strong>.</div>
-                      <div>5. Pre tlač použi <strong>CTRL + P</strong>.</div>
-                      <div>6. Tlač je automaticky optimalizovaná pre <strong>A4 landscape</strong>.</div>
-                    </div>
-
-                    <div>
-                      <strong>Nastavenia:</strong>
-                    </div>
-
-                    <div className="space-y-2 pl-2">
-                      <div><strong>Veľkosť QR</strong> → nastavuje veľkosť QR kódu.</div>
-                      <div><strong>Veľkosť horného textu</strong> → veľkosť nadpisu nad QR.</div>
-                      <div><strong>Veľkosť spodného textu</strong> → veľkosť textu pod QR.</div>
-                      <div><strong>Strana palety</strong> → zobrazí REGAL indikátor pre ľavú alebo pravú stranu.</div>
-                    </div>
-
-                    <div>
-                      <strong>Dôležité:</strong>
-                    </div>
-
-                    <div className="space-y-2 pl-2">
-                      <div>• QR sa generuje automaticky po vyplnení poľa Lokácie / QR.</div>
-                      <div>• Prázdne riadky sa automaticky ignorujú.</div>
-                      <div>• Preview zodpovedá výslednej tlači.</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-gray-700">
@@ -415,6 +384,29 @@ export default function App() {
           </CardContent>
         </Card>
 
+    {preview.length > 0 && (
+  <div
+    style={{
+      background: "white",
+      padding: "20px",
+      borderRadius: "12px",
+      marginBottom: "20px",
+    }}
+  >
+    <h3>Náhľad</h3>
+
+    {preview[0]?.code && (
+      <img
+        src={preview[0].code}
+        alt="preview"
+        style={{
+          width: "200px",
+          height: "200px",
+        }}
+      />
+    )}
+  </div>
+)}
         <div className="space-y-8 print-container">
           {preview.map((item, i) => (
             <div
@@ -519,8 +511,10 @@ export default function App() {
               )}
             </div>
           ))}
-        </div>
+             </div>
       </div>
+    </div>
+  </div>
     </>
   );
 }

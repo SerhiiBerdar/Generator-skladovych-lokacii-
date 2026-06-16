@@ -1,8 +1,24 @@
 import jsPDF from "jspdf";
 import React, { useState } from "react";
 import QRCode from "qrcode";
-const Button = ({ children, ...props }) => (
-  <button {...props}>{children}</button>
+const Button = ({ children, style = {}, ...props }) => (
+  <button
+    {...props}
+    style={{
+      background: "#2563eb",
+      color: "white",
+      border: "none",
+      borderRadius: "10px",
+      padding: "12px 24px",
+      fontSize: "16px",
+      fontWeight: "600",
+      cursor: "pointer",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+      ...style,
+    }}
+  >
+    {children}
+  </button>
 );
 
 const Input = (props) => (
@@ -31,7 +47,6 @@ export default function App() {
 
   const [preview, setPreview] = useState([]);
   const [sideMode, setSideMode] = useState("none");
-  const [showFAQ, setShowFAQ] = useState(false);
 
   const A4 = { width: 1123, height: 794 };
 
@@ -268,16 +283,6 @@ export default function App() {
       <div style={{ padding: "12px" }}>👁 Náhľad</div>
       <div style={{ padding: "12px" }}>📄 PDF Export</div>
 
-      <button
-        onClick={() => setShowFAQ(!showFAQ)}
-        style={{
-          marginTop: "20px",
-          width: "100%",
-          padding: "12px",
-        }}
-      >
-        ❓ FAQ
-      </button>
     </div>
   </div>
 
@@ -345,16 +350,20 @@ export default function App() {
       await generatePreview();
     }}
   >
-    Generovať obrázky
+    👁 Generovať obrázky
   </Button>
 
   <Button
     onClick={generatePDF}
+    style={{
+      background: "#16a34a",
+    }}
   >
-    Generovať PDF
+    📄 Generovať PDF
   </Button>
 </div>
-            <div className="grid grid-cols-2 gap-4">
+
+<div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-gray-700">
                   Popisy

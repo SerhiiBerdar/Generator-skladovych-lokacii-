@@ -1,3 +1,4 @@
+import jsPDF from "jspdf";
 import React, { useState } from "react";
 import QRCode from "qrcode";
 const Button = ({ children, ...props }) => (
@@ -70,6 +71,101 @@ export default function App() {
 
     setPreview(items);
   };
+  const generatePDF = async () => {
+  const pdf = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const descArr = descriptions.split("\n").map((d) => d.trim());
+  const locArr = locations.split("\n").map((l) => l.trim());
+
+  const maxLength = Math.max(descArr.length, locArr.length);
+
+  let firstPage = true;
+
+  for (let i = 0; i < maxLength; i++) {
+    const desc = descArr[i] || "";
+    const text = locArr[i] || "";
+
+    if (!desc && !text) continue;
+
+    if (!firstPage) {
+      pdf.addPage();
+    }
+
+    firstPage = false;
+
+    pdf.setFont("helvetica", "bold");
+
+    if (desc) {
+      pdf.setFontSize(28);
+      pdf.text(desc, 148, 25, {
+        align: "center",
+      });
+    }
+
+    if (sideMode !== "none") {
+      pdf.setFillColor(63, 63, 70);
+      pdf.rect(70, 35, 160, 20, "F");
+
+      pdf.setFillColor(120, 113, 108);
+
+      if (sideMode === "left") {
+        pdf.rect(70, 35, 25, 20, "F");
+      } else {
+        pdf.rect(205, 35, 25, 20, "F");
+      }
+
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(24);
+      pdf.text("REGAL", 148, 48, {
+        align: "center",
+      });
+
+      if (sideMode === "left") {
+        pdf.text("X", 82, 48, {
+          align: "center",
+        });
+      } else {
+        pdf.text("X", 218, 48, {
+          align: "center",
+        });
+      }
+    }
+
+    if (text) {
+      const qrData = await QRCode.toDataURL(text, {
+        width: 1000,
+        margin: 1,
+      });
+
+      pdf.addImage(
+        qrData,
+        "PNG",
+        95,
+        65,
+        100,
+        100
+      );
+
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(24);
+
+      pdf.text(
+        text,
+        148,
+        185,
+        {
+          align: "center",
+        }
+      );
+    }
+  }
+
+  pdf.save("lokacie.pdf");
+};
 
   return (
     <>
@@ -209,15 +305,21 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center">
-              <Button
-                onClick={async () => {
-                  await generatePreview();
-                }}
-              >
-                Generovať obrázky
-              </Button>
-            </div>
+           <div className="flex flex-wrap gap-4 items-center">
+  <Button
+    onClick={async () => {
+      await generatePreview();
+    }}
+  >
+    Generovať obrázky
+  </Button>
+
+  <Button
+    onClick={generatePDF}
+  >
+    Generovať PDF
+  </Button>
+</div>
 
             <div
               className={`fixed top-4 right-4 z-50 transition-all duration-300 ${

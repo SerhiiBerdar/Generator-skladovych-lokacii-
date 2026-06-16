@@ -14,7 +14,7 @@ export default function App() {
   const [descriptions, setDescriptions] = useState("");
   const [locations, setLocations] = useState("");
 
-  const [preview, setPreview] = useState<any[]>([]);
+  const [preview, setPreview] = useState([]);
   const [sideMode, setSideMode] = useState("none");
   const [showFAQ, setShowFAQ] = useState(false);
 

@@ -1,10 +1,24 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
 import QRCode from "qrcode";
+const Button = ({ children, ...props }) => (
+  <button {...props}>{children}</button>
+);
 
+const Input = (props) => (
+  <input {...props} />
+);
+
+const Textarea = (props) => (
+  <textarea {...props} />
+);
+
+const Card = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const CardContent = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
 export default function App() {
   const [size, setSize] = useState(450);
   const [titleSize, setTitleSize] = useState(65);

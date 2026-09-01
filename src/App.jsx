@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import React, { useState } from "react";
 import QRCode from "qrcode";
 const Button = ({ children, style = {}, ...props }) => (
@@ -86,101 +87,58 @@ export default function App() {
 
     setPreview(items);
   };
+  const waitForImages = async (node) => {
+    const imgs = Array.from(node.querySelectorAll("img"));
+    await Promise.all(
+      imgs.map((img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise((resolve) => {
+              img.onload = resolve;
+              img.onerror = resolve;
+            })
+      )
+    );
+  };
+
   const generatePDF = async () => {
-  const pdf = new jsPDF({
-    orientation: "landscape",
-    unit: "mm",
-    format: "a4",
-  });
+    await generatePreview();
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-  const descArr = descriptions.split("\n").map((d) => d.trim());
-  const locArr = locations.split("\n").map((l) => l.trim());
+    const nodes = document.querySelectorAll(".print-area");
+    if (nodes.length === 0) return;
 
-  const maxLength = Math.max(descArr.length, locArr.length);
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
 
-  let firstPage = true;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
 
-  for (let i = 0; i < maxLength; i++) {
-    const desc = descArr[i] || "";
-    const text = locArr[i] || "";
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
 
-    if (!desc && !text) continue;
+      await waitForImages(node);
 
-    if (!firstPage) {
-      pdf.addPage();
-    }
-
-    firstPage = false;
-
-    pdf.setFont("helvetica", "bold");
-
-    if (desc) {
-      pdf.setFontSize(28);
-      pdf.text(desc, 148, 25, {
-        align: "center",
+      const canvas = await html2canvas(node, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
       });
-    }
 
-    if (sideMode !== "none") {
-      pdf.setFillColor(63, 63, 70);
-      pdf.rect(70, 35, 160, 20, "F");
+      const imgData = canvas.toDataURL("image/png");
 
-      pdf.setFillColor(120, 113, 108);
-
-      if (sideMode === "left") {
-        pdf.rect(70, 35, 25, 20, "F");
-      } else {
-        pdf.rect(205, 35, 25, 20, "F");
+      if (i > 0) {
+        pdf.addPage();
       }
 
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(24);
-      pdf.text("REGAL", 148, 48, {
-        align: "center",
-      });
-
-      if (sideMode === "left") {
-        pdf.text("X", 82, 48, {
-          align: "center",
-        });
-      } else {
-        pdf.text("X", 218, 48, {
-          align: "center",
-        });
-      }
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
     }
 
-    if (text) {
-      const qrData = await QRCode.toDataURL(text, {
-        width: 1000,
-        margin: 1,
-      });
-
-      pdf.addImage(
-        qrData,
-        "PNG",
-        95,
-        65,
-        100,
-        100
-      );
-
-      pdf.setTextColor(0, 0, 0);
-      pdf.setFontSize(24);
-
-      pdf.text(
-        text,
-        148,
-        185,
-        {
-          align: "center",
-        }
-      );
-    }
-  }
-
-  pdf.save("lokacie.pdf");
-};
+    pdf.save("lokacie.pdf");
+  };
 
   return (
     <>
